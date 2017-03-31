@@ -363,17 +363,6 @@ PUBLIC "-//W3C//DTD XHTL 1.0 Transitional//EN"
 					</a>
 					</div>";
 				
-				
-				if($columnCount == 2)
-				{
-					echo "</div>";
-					echo "<div class=\"row\">";
-					$columnCount = 0;
-				}
-				else
-				{
-					++$columnCount;
-				}
 			}
 			echo "</div>";
 			echo "</div>";
