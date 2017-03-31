@@ -8,17 +8,17 @@
     <meta name="author" content="Akash & Dono">
 
     <title>Spectra</title>
-    <script src="src/color-thief.js"></script>
-    <script src="examples/js/jquery.js"></script>
-    <script src="examples/js/mustache.js"></script>
-    <script src="examples/js/demo.js"></script>
+    <script src="/ColorThief/src/color-thief.js"></script>
+    <script src="/ColorThief/examples/js/jquery.js"></script>
+    <script src="/ColorThief/examples/js/mustache.js"></script>
+    <script src="/ColorThief/examples/js/demo.js"></script>
     <!-- Bootstrap Core CSS -->
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 	<link href="/main.css" rel="stylesheet">
 	</head>
-<body onload="checkFileAPI();">
+<body onload="checkFileAPI(); readText();">
 
 	<div id="myModal" class="modal fade" role="dialog">
 	  <div class="modal-dialog modal-lg">
@@ -42,18 +42,9 @@
 	  </div>
 	</div>
 
-	<div class="container-fluid">  
+	<div class="container-fluid" style="padding:0 !important;">  
 		<div class="row">
-			<div class="col-sm-12">
-				<div style="display:block;">
-					<input style="float:right;" type="file" onchange='readText(this)' />
-					<h3 style="">Film Spectra Visualization:</h3>   
-				</div>
-				<hr/>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-sm-12" style="text-align:center;">
+			<div class="col-sm-12" style="text-align:center; padding:0 !important;">
 					<ul id="spectraVisualizationUL">
 					</ul>
 			</div>
@@ -61,6 +52,18 @@
     </div>
 </body>
 <script>
+	Url = {
+		get get(){
+			var vars= {};
+			if(window.location.search.length!==0)
+				window.location.search.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value){
+					key=decodeURIComponent(key);
+					if(typeof vars[key]==="undefined") {vars[key]= decodeURIComponent(value);}
+					else {vars[key]= [].concat(vars[key], decodeURIComponent(value));}
+				});
+			return vars;
+		}
+	};
 	$(document).ready(function(){
 		$(".btn").click(function(){
 			$("#myModal").modal('show');
@@ -80,40 +83,27 @@
             return false;
         }
     }
-
     /**
      * read text input
      */
-    function readText(filePath) {
+    function readText() {
+		var filePath = 'http://localhost:8080/libs/' + Url.get.year + '/' + Url.get.school_year + '/' + Url.get.film + '/' + 'results.txt';
         var output = ""; //placeholder for text output
-        if(filePath.files && filePath.files[0]) {           
-            reader.onload = function (e) {
-                output = e.target.result;
-                displayContents(output);
-            };//end onload()
-            reader.readAsText(filePath.files[0]);
-        }//end if html5 filelist support
-        else if(ActiveXObject && filePath) { //fallback to IE 6-8 support via ActiveX
             try {
-                reader = new ActiveXObject("Scripting.FileSystemObject");
-                var file = reader.OpenTextFile(filePath, 1); //ActiveX File Object
-                output = file.ReadAll(); //text contents of file
-                file.Close(); //close file "input stream"
-                displayContents(output);
+				xmlhttp = new XMLHttpRequest();
+				xmlhttp.open("GET",filePath,false);
+				xmlhttp.send(null);
+				var fileContent = xmlhttp.responseText;
+				displayContents(fileContent);
             } catch (e) {
                 if (e.number == -2146827859) {
                     alert('Unable to access local files due to browser security settings. ' + 
                      'To overcome this, go to Tools->Internet Options->Security->Custom Level. ' + 
                      'Find the setting for "Initialize and script ActiveX controls not marked as safe" and change it to "Enable" or "Prompt"'); 
                 }
-            }       
-        }
-        else { //this is where you could fallback to Java Applet, Flash or similar
-            return false;
-        }       
+            }             
         return true;
     }   
-
     /**
      * display content using a basic HTML replacement
      */
@@ -121,7 +111,6 @@
 		var hex_values = txt.split('#');
 		makeUL(hex_values);
     }
-
 	function makeUL(array) {
 		// Create the list element:
 		var list = document.getElementById('spectraVisualizationUL');
@@ -129,7 +118,6 @@
 		for(var i = 3; i < array.length+1; i++) {
 			// Create the list item:
 			var item = document.createElement('li');
-
 			var divColorBar = document.createElement("div");
 			divColorBar.id = (i-2).toString();
 			divColorBar.className = "avgColorImg";
@@ -154,13 +142,11 @@
 				/* Getting the Max and Min values for Chroma. */
 				var max = Math.max.apply(Math, colors[c]);
 				var min = Math.min.apply(Math, colors[c]);
-
 				/* Variables for HSV value of hex color. */
 				var chr = max-min;
 				var hue = 0;
 				var val = max;
 				var sat = 0;
-
 				if (val > 0) {
 				  /* Calculate Saturation only if Value isn't 0. */
 				  sat = chr/val;
@@ -175,13 +161,11 @@
 					}
 				  }
 				}
-
 				/* Modifies existing objects by adding HSV values. */
 				colors[c].hue = hue;
 				colors[c].sat = sat;
 				colors[c].val = val;
 			  }
-
 			  /* Sort by Hue. */
 			  return colors.sort(function(a,b){return a.hue - b.hue;});
 			}
@@ -201,7 +185,7 @@
 		var myFunction = function() {
 			var previewDiv = document.getElementById("photoPreview");
 			var previewFrame = document.getElementById("photoFrame");
-			previewDiv.src = "/libs/" + currFilePath + "/image-" + this.id + ".jpeg";
+			previewDiv.src = "/libs/" + Url.get.year + '/' + Url.get.school_year + '/' + Url.get.film + "/image-" + this.id + ".jpeg";
 			previewFrame.style.background = this.style.background;
 			$('#myModal').modal('show');
 			$("#photoPreview").one('load', function() {
@@ -225,7 +209,6 @@
 			
 			// Gets the 9 most common colors in the image. Stores the RGB values into an array of dim. 9x3
 			var rgbVals = colorThief.getPalette(photoPreview, 10);
-
 			// DONAVIN COMMENT OUT THIS LINE OF TEXT BELOW TO SEE WHAT THE HUE SORTING IS DOING
 			rgbVals = sortColors(rgbVals);
 			
@@ -248,7 +231,6 @@
 			document.getElementById("domCircle").style.backgroundColor = rgbToHex(colorThief.getColor(photoPreview));
 			})
 		};
-
 		for (var i = 0; i < classname.length; i++) {
 			classname[i].addEventListener('click', myFunction, false);
 		}
