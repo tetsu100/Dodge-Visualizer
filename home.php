@@ -13,40 +13,32 @@ PUBLIC "-//W3C//DTD XHTL 1.0 Transitional//EN"
 
     <!-- Bootstrap Core CSS -->
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-	<link href="/main.css" rel="stylesheet">
+	<link href="main.css" rel="stylesheet">
+	<link href="sideBar.css" rel="stylesheet">
 	<!-- jquery -->
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	<style>
-	
-		.dropdown-submenu {
-			position: relative;
-		}
-
-		.dropdown-submenu .dropdown-menu {
-			top: 0;
-			left: 100%;
-			margin-top: -1px;
-		}
 		
 		body
 		{
 			background-color: grey;
 		}
-		.row
+		.container-fluid
 		{
-			margin-top: 1px;
+			padding: 5px;
 		}
 		.col-md-4
 		{
+			padding-bottom: 5px;
 			padding-left: 5px;
 			padding-right: 5px;
 		}
 		.col-padding:hover
 		{
-			filter: brightness(30%);
+			filter: brightness(30%) !important;
 		}
 		.col-padding
 		{
@@ -57,32 +49,30 @@ PUBLIC "-//W3C//DTD XHTL 1.0 Transitional//EN"
 			padding-left: 40px;
 			padding-right: 40px;
 		}
-		.image-container:after {
-			content: '';
-			position: absolute;
-			top: 0%;
-			left: 0%;
-			width: 100%;
-			height: 100%;
-			box-shadow: inset 0px 0px 150px 60px rgba(0,0,0,0.8);
-		}
 		.title
 		{
 			font-size: 20px;
 		}
-	
-	
-	
+		a:link, a:visited 
+		{
+			text-decoration:none;
+			color: black;
+		}
 	
 	<?php
-		for($i = 0;$i < 20;++$i)
+		echo ".sidebar-nav li:first-child a {
+			color: #fff;
+			background-color: #";
+		echo dechex(mt_rand(4337923, 16777215));
+		echo "}";
+		$i = 2;
+		foreach(glob("./libs/*") as $thing)
 		{
-			echo ".sideBarElement$i:before
-			{
-				background-color:";
-			echo dechex(mt_rand(0, 16777215));
-				
+			echo ".sidebar-nav li:nth-child($i):before {
+					background-color: #";
+			echo dechex(mt_rand(4337923, 16777215));   
 			echo "}";
+			++$i;
 		}
 
 	?>
@@ -94,19 +84,14 @@ PUBLIC "-//W3C//DTD XHTL 1.0 Transitional//EN"
 		{
 			$imageData = file_get_contents($filePath);
 			$hexValues = split('#', $imageData);
-			$height = 800/count($hexValues).'px';
-			echo "<ul class=\"list-unstyled\">";
+			$height = 100/count($hexValues);
+			echo "<ul class=\"list-unstyled image-container\">";
 			for($i = 1;$i < count($hexValues);++$i)
 			{
 				$curID = (string)($i);
 				$curColor = '#' . $hexValues[$i];
-				
-				//echo $curColor;
-				echo "<li>
-				
-						<div id=\"$curID\" className=\"avgColorImg\" style=\"width:100%;height:$height;background-color:$curColor\">	
-						</div>
-						
+
+				echo "<li id=\"$curID\" style=\"width:100%;height:$height%;background-color:$curColor\">
 					</li>";
 			}
 			echo "</ul>";
@@ -126,19 +111,19 @@ PUBLIC "-//W3C//DTD XHTL 1.0 Transitional//EN"
 				$file = substr($file, 9+strlen($year)+strlen($schoolYear));
 
 				echo "<div class=\"col-md-4 col-sm-6\">
-						<div class=\"col-padding\">
-						<a href=\"./index.php/?year=$year&school_year=$schoolYear&film=$file\">";//pass the film's directory name to index.php
+						<a href=\"./index.php/?year=$year&school_year=$schoolYear&film=$file\"><!--pass the film's directory name to index.php-->
+						<div class=\"col-padding\">";
 						
 				echo "<br /><br />";
-				//create the color spectru image for the film:
+				//create the color spectrum image for the film:
 				$filePath = ".\\libs\\$year\\$schoolYear\\$file\\results.txt";
 				createImage($filePath);
 				//echo $file;
 				echo "<br /><p class=\"title\" align=\"center\">$file</p>
 						<br />";
 
-				echo "</a>
-					</div>
+				echo "</div>
+					</a>
 					</div>";
 				
 				
@@ -156,66 +141,97 @@ PUBLIC "-//W3C//DTD XHTL 1.0 Transitional//EN"
 			echo "</div>";
 			echo "</div>";
 		}
-		
+		function createSideBar()
+		{
+			echo "<li class=\"sidebar-brand sideBarElement0\">
+					<a href=\"home.php\">
+					   Home
+					</a>
+				</li>";
+
+			foreach(glob("./libs/*") as $yearDirect)
+			{
+				$yearDirect = substr($yearDirect,7);
+				if($yearDirect == "All")
+				{
+					continue;
+				}
+				echo "<li class=\"dropdown\">
+				  <a href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\">$yearDirect<span class=\"caret\"></span></a>
+				  <ul class=\"dropdown-menu\" role=\"menu\">
+					<li class=\"dropdown-header\">Grade:</li>
+					<li><a href=\"?year=$yearDirect&school_year=AP\">AP</a></li>
+					<li><a href=\"?year=$yearDirect&school_year=IP\">IP</a></li>
+					<li><a href=\"?year=$yearDirect&school_year=Thesis\">Thesis</a></li>
+				  </ul>
+				</li>
+				";
+			}
+		}
 	?>
   </head>
   
   <body>
 
-	<div class="dropdown">
-    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Films
-    </button>
-    <ul class="dropdown-menu" >
-      <li class="dropdown-submenu">
-        <a class="test" tabindex="-1" href="#">2017</a>
-        <ul class="dropdown-menu">
-          <li style="opacity: 1"><a tabindex="-1" href="home.php/?year=2016&school_year=Thesis">Thesis</a></li>
-          <li style="opacity: 1"><a tabindex="-1" href="#">AP</a></li>
-          <li style="opacity: 1"><a tabindex="-1" href="#">IP</a></li>
-        </ul>
-      </li>
-      <li class="dropdown-submenu">
-        <a class="test" tabindex="-1" href="#">2016</a>
-        <ul class="dropdown-menu">
-          <li><a tabindex="-1" href="#">Thesis</a></li>
-          <li><a tabindex="-1" href="#">AP</a></li>
-          <li><a tabindex="-1" href="#">IP</a></li>
-        </ul>
-      </li>
-      <li class="dropdown-submenu">
-        <a class="test" tabindex="-1" href="#">2015</a>
-        <ul class="dropdown-menu">
-          <li><a tabindex="-1" href="#">Thesis</a></li>
-          <li><a tabindex="-1" href="#">AP</a></li>
-          <li><a tabindex="-1" href="#">IP</a></li>
-        </ul>
-      </li>
-      <li class="dropdown-submenu">
-        <a class="test" tabindex="-1" href="#">2014</a>
-        <ul class="dropdown-menu">
-          <li><a tabindex="-1" href="#">Thesis</a></li>
-          <li><a tabindex="-1" href="#">AP</a></li>
-          <li><a tabindex="-1" href="#">IP</a></li>
-        </ul>
-      </li>
-    </ul>
-  </div>
-
-	<?php
-		createTable();
-	?>
+	<div id="wrapper">
+		<div class="overlay"></div>
 	
+		<!-- Sidebar -->
+		<nav class="navbar navbar-inverse navbar-fixed-top" id="sidebar-wrapper" role="navigation">
+			<ul class="nav sidebar-nav">
+				<?php createSideBar() ?>
+			</ul>
+		</nav>
+
+
+		<!-- Page Content -->
+		<div id="page-content-wrapper">
+			<button type="button" class="hamburger is-closed" data-toggle="offcanvas">
+				<span class="hamb-top"></span>
+				<span class="hamb-middle"></span>
+				<span class="hamb-bottom"></span>
+			</button>
+			<?php createTable(); ?>
+		</div>
+
+	</div>
+	<!-- /#wrapper -->
 	
 	<script>
+		$(document).ready(function () {
+		  var trigger = $('.hamburger'),
+			  overlay = $('.overlay'),
+			 isClosed = false;
 
-	
-	$(document).ready(function(){
-	  $('.dropdown-submenu a.test').on("click", function(e){
-		$(this).next('ul').toggle();
-		e.stopPropagation();
-		e.preventDefault();
-	  });
-	});
+			trigger.click(function () {
+			  hamburger_cross();      
+			});
+
+			function hamburger_cross() {
+
+			  if (isClosed == true) {          
+				overlay.hide();
+				trigger.removeClass('is-open');
+				trigger.addClass('is-closed');
+				isClosed = false;
+			  } else {   
+				overlay.show();
+				trigger.removeClass('is-closed');
+				trigger.addClass('is-open');
+				isClosed = true;
+			  }
+		  }
+		  
+		  $('[data-toggle="offcanvas"]').click(function () {
+				$('#wrapper').toggleClass('toggled');
+		  });  
+		});
+		
+		$('.image-container').css('height', $(window).height()*(8/10)  + 'px');
+		
+		$( window ).resize(function() {
+		  $('.image-container').css('height', $(window).height()*(8/10)  + 'px');
+		});
 	</script>
   </body>
 </html>
