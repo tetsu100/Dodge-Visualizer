@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #spectraVisualizationUL li{
 	margin: 0 0;
 }
@@ -115,15 +114,7 @@ body {
 .fa {
 	color:white;
 	font-size:3em !important;
-}
-=======
-#spectraVisualizationUL li{
-	margin: 0 0;
-}
-
-#spectraVisualizationUL {
-	list-style: none;
-	padding: 0px;
+}	padding: 0px;
 }
 
 #photoPreview {
