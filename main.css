@@ -8,8 +8,14 @@
 }
 
 #photoPreview {
-	height:50vh;
 	width:100%;
+}
+
+#spectrum2jpg {
+	z-index:1;
+	position:fixed;
+    top: 1.5vh;
+    right: 1vw; 
 }
 
 #photoFrame {
@@ -46,9 +52,25 @@
 	width: 19%;
 }
 
+#spectrum2jpg:hover {
+	font-size:4em !important;
+	transition:font-size 0.1s; /* Animation time */
+    -webkit-transition:font-size 0.1s; /* For Safari */
+}
+
 body {
 	color: black;
 	background-color:white;
+}
+
+.arrow {
+    color: white;
+}
+
+.col-sm-1 {
+	text-align:center;
+	padding-top:21%;
+	font-size:1.6em;
 }
 
 .circles {
@@ -69,7 +91,7 @@ body {
 }
 
 .avgColorImg:hover {
-    width: 80vw;
+    width: 90%;
 }
 
 .container-fluid .row {
@@ -87,4 +109,9 @@ body {
     -webkit-border-radius: 0px !important;
     -moz-border-radius: 0px !important;
     border-radius: 0px !important; 
+}
+
+.fa {
+	color:white;
+	font-size:3em !important;
 }
